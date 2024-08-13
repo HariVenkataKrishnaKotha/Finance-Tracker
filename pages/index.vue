@@ -15,14 +15,22 @@
     </section>
 
     <section>
-        <transaction/>
-        <transaction/>
-        <transaction/>
-        <transaction/>
+        <Transaction v-for="transaction in transactions" :key="transaction.id" :transaction="transaction" />
     </section>
 </template>
 
 <script setup>
     import { transactionViewOptions } from '~/constants';   
+    const supabase = useSupabaseClient()
     const selectedView = ref(transactionViewOptions[1])
+    const transactions = ref([])
+    const { data, pending } = await useAsyncData('transactions', async () => {
+    const { data, error } = await supabase
+        .from('transactions')
+        .select()
+    if (error) return []
+    return data
+    })
+    transactions.value = data.value
+
 </script>
