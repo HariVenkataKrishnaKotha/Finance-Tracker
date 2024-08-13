@@ -9,12 +9,16 @@
     </section>
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
         <Trend color="green" title="Income" :amount="4000" :lastAmount="3000" :loading="false" />
-        <Trend color="red" title="Income" :amount="4000" :lastAmount="3000" :loading="false" />
-        <Trend color="green" title="Income" :amount="4000" :lastAmount="3000" :loading="false" />
-        <Trend color="red" title="Income" :amount="4000" :lastAmount="3000" :loading="true" />
         <Trend color="red" title="Expense" :amount="4000" :lastAmount="5000" :loading="false" />
         <Trend color="green" title="Investments" :amount="4000" :lastAmount="3000" :loading="false" />
         <Trend color="red" title="Saving" :amount="4000" :lastAmount="4100" :loading="false" />
+    </section>
+
+    <section>
+        <transaction/>
+        <transaction/>
+        <transaction/>
+        <transaction/>
     </section>
 </template>
 
