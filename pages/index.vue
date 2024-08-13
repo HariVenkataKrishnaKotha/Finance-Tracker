@@ -22,7 +22,8 @@
       </div>
     </div>
     <div>
-      <UButton icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add" />
+      <TransactionModal v-model="isOpen" /> 
+      <UButton icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add" @click="isOpen = true" />
     </div>
     </section>
 
@@ -44,6 +45,7 @@
     const selectedView = ref(transactionViewOptions[1])
     const transactions = ref([])
     const isLoading = ref(false)
+    const isOpen = ref(false)
 
 const income = computed(
   () => transactions.value.filter(t => t.type === 'Income')
