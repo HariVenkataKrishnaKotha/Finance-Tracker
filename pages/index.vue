@@ -69,6 +69,7 @@ const fetchTransactions = async () => {
       const { data, error } = await supabase
         .from('transactions')
         .select()
+        .order('created_at', { ascending: false })
 
         if (error) return []
 
@@ -91,6 +92,14 @@ await refreshTransactions()
     }
     grouped[date].push(transaction)
   }
+
+  // const sortedKeys = Object.keys(grouped).sort().reverse()
+  // const sortedGrouped = {}
+  // for (const key of sortedKeys) {
+  //   sortedGrouped[key] = grouped[key]
+  // }
+  // return sortedGrouped
+
   return grouped
 })
 console.log(transactionsGroupedByDate.value)
