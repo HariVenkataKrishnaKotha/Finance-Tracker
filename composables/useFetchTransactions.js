@@ -19,16 +19,18 @@ export const useFetchTransactions = (period) => {
     const expenseTotal = computed(
       () => expense.value.reduce((sum, transaction) => sum + transaction.amount, 0)
     )
+
+    const netTotal = computed(() => incomeTotal.value - expenseTotal.value)
   
     const fetchTransactions = async () => {
       pending.value = true
       try {
-        const { data } = await useAsyncData(`transactions-${period.value.from.toDateString()}-${period.value.to.toDateString()}`, async () => {
+        const { data } = await useAsyncData(`transactions-${period?.value?.from.toDateString()}-${period?.value?.to.toDateString()}`, async () => {
           const { data, error } = await supabase
             .from('transactions')
             .select()
-            .gte('created_at', period.value.from.toISOString())
-            .lte('created_at', period.value.to.toISOString())
+            .gte('created_at', period?.value?.from.toISOString())
+            .lte('created_at', period?.value?.to.toISOString())
             .order('created_at', { ascending: false })
   
           if (error) return []
@@ -42,7 +44,28 @@ export const useFetchTransactions = (period) => {
       }
     }
   
+    const fetchAllTransactions = async () => {
+      pending.value = true
+      try {
+        const { data, error } = await supabase
+          .from('transactions')
+          .select()
+          .lte('created_at', new Date().toISOString())  // Fetch transactions till today
+          .order('created_at', { ascending: false })
+  
+        if (error) {
+          console.error(error)
+          return []
+        }
+  
+        transactions.value = data
+      } finally {
+        pending.value = false
+      }
+    }
+
     const refresh = async () => transactions.value = await fetchTransactions()
+    const refreshAll = async () => await fetchAllTransactions()
 
     watch(period, async () => await refresh(), { immediate: true })
   
@@ -73,9 +96,11 @@ export const useFetchTransactions = (period) => {
         incomeTotal,
         expenseTotal,
         incomeCount,
-        expenseCount
+        expenseCount,
+        netTotal
       },
       refresh,
+      refreshAll,
       pending
     }
   }

@@ -1,60 +1,54 @@
 <template>
-    <UCard v-if="!success">
-      <template #header>
-        Finance Tracker Sign-in
-      </template>
-  
-      <form @submit.prevent="handleLogin">
-        <UFormGroup label="Email" name="email" class="mb-4" :required="true"
-          help="Confirmation link will be sent to your email">
-          <UInput type="email" placeholder="Email" required v-model="email" />
-        </UFormGroup>
-  
-        <UButton type="submit" variant="solid" color="black" :loading="pending" :disabled="pending">Sign-in</UButton>
-      </form>
-    </UCard>
-    <UCard v-else>
-      <template #header>
-        You received an email ;)
-      </template>
-  
-      <div class="text-center">
-        <p class="mb-4">Email has been set to <strong>{{ email }}</strong> with a sign-in link</p>
-        <p>
-          <strong>Important:</strong> The link will expire in 5 minutes.
-        </p>
-      </div>
-    </UCard>
-  </template>
-  
-  <script setup>
-  const success = ref(false)
-  const email = ref('')
-const pending = ref(false)
+  <UCard>
+    <template #header>
+      Finance Tracker Sign-in / Sign-up
+    </template>
+
+    <UButton 
+      variant="outline" 
+      color="black" 
+      :loading="googlePending" 
+      :disabled="googlePending" 
+      @click="handleGoogleAuth"
+      class="flex items-center space-x-2"
+    >
+      <UIcon name="i-mdi-google" class="w-5 h-5" /> 
+      <span>Continue with Google</span>
+    </UButton>
+  </UCard>
+</template>
+
+<script setup>
+const googlePending = ref(false)
 const { toastError } = useAppToast()
 const supabase = useSupabaseClient()
 
-useRedirectIfAuthenticated()
+useRedirectIfAuthenticated() // Redirects if already authenticated
 
-const handleLogin = async () => {
-  pending.value = true
+const handleGoogleAuth = async () => {
+  googlePending.value = true;
   try {
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.value,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/confirm'
-      }
-    })
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}` },
+    });
+
     if (error) {
-        toastError({
-        title: 'Authentication Error!!!',
-        description: error.message
-      })
+      console.error('Authentication Error:', error.message);
     } else {
-      success.value = true
+      console.log('Login successful, fetching user...');
+      setTimeout(async () => {
+        const { data, error } = await supabase.auth.getUser();
+        console.log('Fetched User:', data, error);
+        if (data?.user) {
+          console.log('User exists, reloading page...');
+          window.location.reload();
+        }
+      }, 1500);
     }
   } finally {
-    pending.value = false
+    googlePending.value = false;
   }
-}
-  </script>
+};
+
+</script>
