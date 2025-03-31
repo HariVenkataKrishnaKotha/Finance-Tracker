@@ -6,7 +6,7 @@
         <USkeleton class="h-8 w-full" v-if="loading" />
         <div v-else>{{ currency }}</div>
       </div>
-  
+      <div v-if="showTrend">
       <div>
         <USkeleton class="h-6 w-full" v-if="loading" />
       <div v-else class="flex space-x-1 items-center text-sm">
@@ -17,6 +17,7 @@
       </div>
       </div>
     </div>
+    </div>
   </template>
   
   <script setup>
@@ -26,7 +27,11 @@
     amount: Number,
     lastAmount: Number,
     color: String,
-    loading: Boolean
+    loading: Boolean,
+    showTrend:{
+      type: Boolean,
+      default: true
+    }
   })
 
   const {amount} = toRefs(props)
@@ -45,7 +50,7 @@ const percentageTrend = computed(() => {
   const lower = Math.min(props.amount, props.lastAmount)
   const ratio = ((bigger - lower) / lower) * 100
   // console.log(bigger, lower, ratio, Math.ceil(ratio))
-  return `${Math.ceil(ratio)}%`
+  return `${Math.ceil(Math.abs(ratio))}%`
 })
 </script>
   
